@@ -1,0 +1,25 @@
+name = "minecraft-online"            # 部署後網址會是 https://minecraft-online.<你的帳號>.workers.dev
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+# 靜態檔案（遊戲畫面）：public/ 資料夾
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# 多人房間：每個房間名稱對應一個 Durable Object（保存世界種子、玩家蓋的方塊）
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]       # 免費方案也可使用 SQLite 版 Durable Object
+
+# ---- Supabase（可選：不填就是「訪客 + 公開房間」模式）----
+[vars]
+SUPABASE_URL = ""          # 例：https://abcdxyz.supabase.co
+SUPABASE_ANON_KEY = ""     # Project Settings → API → anon public（可公開，登入用）
+REQUIRE_LOGIN = "0"        # "1" = 一律要登入才能進任何房間
+# 秘密金鑰不要寫在檔案裡，用這個指令設定：
+#   npx wrangler secret put SUPABASE_SERVICE_KEY      （service_role 金鑰，只放在 Worker）
